@@ -1,0 +1,18 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+.wrangler
+
+# IDE
+.vscode
+.idea
+
+# Env
+.env
+.env.local
+.dev.vars
+
+# OS
+.DS_Store
