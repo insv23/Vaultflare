@@ -32,6 +32,21 @@ cd backend && pnpm deploy   # 部署到 Cloudflare
 cd backend && pnpm cf-typegen  # 生成 Cloudflare 类型
 ```
 
+## 改动后校验要求
+
+每次改动后端代码后，必须执行以下命令进行类型检查：
+
+```bash
+cd backend && pnpm -s tsc --noEmit
+```
+
+每次改动web端代码后，必须执行以下命令进行类型检查：
+
+```bash
+cd web && pnpm -s tsc --noEmit
+```
+
+
 ## 开发规范
 
 - 子目录无独立 git，所有提交在根目录进行
