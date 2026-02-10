@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "db:create": "wrangler d1 create vaultflare",
+    "db:init": "wrangler d1 execute DB --local --file=./db/schema.sql",
+    "db:init:remote": "wrangler d1 execute DB --remote --file=./db/schema.sql"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.2.1",
+    "@scalar/hono-api-reference": "^0.9.40",
+    "hono": "^4.11.9",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "wrangler": "^4.63.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "workerd"
+    ]
+  }
+}
