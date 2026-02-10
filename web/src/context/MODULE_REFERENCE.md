@@ -7,3 +7,4 @@
 | 文件 | 地位 | 功能 |
 |------|------|------|
 | auth.tsx | 认证上下文 | AuthProvider + useAuth()，管理 token/masterKey/userId，暴露 register/login/logout |
+| vault.tsx | 密码库上下文 | VaultProvider + useVault()，管理解密后的 ciphers 列表，暴露 fetchAll/createCipher/updateCipher/deleteCipher |

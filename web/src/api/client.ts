@@ -1,6 +1,6 @@
 // input: 无外部依赖，纯 fetch 封装
-// output: apiFetch() 通用请求函数 + API 类型定义 + KDF 参数映射
-// pos: API 层基础设施，被 context/auth.tsx 依赖
+// output: apiFetch() 通用请求函数 + API 类型定义（Auth + Cipher）+ KDF 参数映射
+// pos: API 层基础设施，被 context/auth.tsx 和 context/vault.tsx 依赖
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
 import type { KdfParams } from "@/crypto/argon2";
@@ -93,6 +93,49 @@ export type VerifyResponse = {
   token_type: "Bearer";
   expires_at: number;
   user_id: string;
+  vault_version: number;
+};
+
+// ---- Cipher API 类型 ----
+
+/** 后端返回的单条 cipher（未解密） */
+export type CipherItem = {
+  cipher_id: string;
+  encrypted_dek: string;
+  encrypted_data: string;
+  item_version: number;
+  vault_version: number;
+  deleted_at: number | null;
+  created_at: number;
+  updated_at: number;
+};
+
+/** GET /api/ciphers 响应 */
+export type CipherListResponse = {
+  vault_version: number;
+  ciphers: CipherItem[];
+};
+
+/** POST /api/ciphers 响应 */
+export type CreateCipherResponse = {
+  cipher_id: string;
+  item_version: number;
+  created_at: number;
+};
+
+/** PUT /api/ciphers/:id 响应 */
+export type UpdateCipherResponse = {
+  cipher_id: string;
+  item_version: number;
+  vault_version: number;
+  updated_at: number;
+};
+
+/** DELETE /api/ciphers/:id 响应 */
+export type DeleteCipherResponse = {
+  cipher_id: string;
+  deleted_at: number;
+  item_version: number;
   vault_version: number;
 };
 
