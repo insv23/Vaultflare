@@ -1,5 +1,5 @@
-// input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + ChangePasswordForm + PasswordGeneratorOptions + shadcn Dialog
-// output: Vault 主页 — 密码列表、搜索、CRUD 操作、删除确认、独立密码生成器弹窗、修改主密码弹窗
+// input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + ChangePasswordForm + PasswordGeneratorOptions + shadcn Dialog + sonner toast
+// output: Vault 主页 — 密码列表、搜索、CRUD 操作（带 toast 反馈）、删除确认、独立密码生成器弹窗、修改主密码弹窗
 // pos: /vault 路由，登录后落地页，密码库的核心交互界面
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -14,6 +14,7 @@ import CipherForm from "@/components/CipherForm";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
 import PasswordGeneratorOptions from "@/components/PasswordGeneratorOptions";
 import { generatePassword, DEFAULT_PASSWORD_OPTIONS, type PasswordOptions } from "@/lib/generate-password";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -62,6 +63,7 @@ export default function Vault() {
 
   async function handleCopy() {
     await navigator.clipboard.writeText(genPassword);
+    toast("Copied to clipboard");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -96,8 +98,10 @@ export default function Vault() {
   async function handleFormSubmit(data: CipherData) {
     if (editingCipher) {
       await updateCipher(editingCipher.cipher_id, data, editingCipher.item_version);
+      toast.success("Password updated");
     } else {
       await createCipher(data);
+      toast.success("Password created");
     }
   }
 
@@ -107,6 +111,7 @@ export default function Vault() {
     try {
       await deleteCipher(deletingCipher.cipher_id, deletingCipher.item_version);
       setDeletingCipher(null);
+      toast.success("Password deleted");
     } catch {
       // error 已由 vault context 设置
     } finally {

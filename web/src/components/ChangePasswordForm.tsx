@@ -1,11 +1,12 @@
-// input: context/auth.tsx (useAuth + changePassword) + api/client.ts (ApiRequestError) + shadcn Dialog/Input/Label/Button
-// output: ChangePasswordForm — 修改主密码的 Dialog 表单，客户端校验 + API 调用 + 成功后自动关闭
+// input: context/auth.tsx (useAuth + changePassword) + api/client.ts (ApiRequestError) + shadcn Dialog/Input/Label/Button + sonner toast
+// output: ChangePasswordForm — 修改主密码的 Dialog 表单，客户端校验 + API 调用 + toast 反馈 + 立即关闭
 // pos: 被 pages/Vault.tsx 调用，toolbar 钥匙图标触发
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
 import { useState, useEffect, type FormEvent } from "react";
 import { useAuth } from "@/context/auth";
 import { ApiRequestError } from "@/api/client";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +31,6 @@ export default function ChangePasswordForm({ open, onClose }: Props) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   // 每次打开时重置所有字段
   useEffect(() => {
@@ -40,7 +40,6 @@ export default function ChangePasswordForm({ open, onClose }: Props) {
       setConfirmPassword("");
       setError(null);
       setSubmitting(false);
-      setSuccess(false);
     }
   }, [open]);
 
@@ -65,8 +64,8 @@ export default function ChangePasswordForm({ open, onClose }: Props) {
     setSubmitting(true);
     try {
       await changePassword(currentPassword, newPassword);
-      setSuccess(true);
-      setTimeout(onClose, 1500);
+      toast.success("Password changed successfully");
+      onClose();
     } catch (err) {
       if (err instanceof ApiRequestError) {
         setError(err.message);
@@ -94,7 +93,7 @@ export default function ChangePasswordForm({ open, onClose }: Props) {
               autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              disabled={submitting || success}
+              disabled={submitting}
             />
           </div>
 
@@ -106,7 +105,7 @@ export default function ChangePasswordForm({ open, onClose }: Props) {
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              disabled={submitting || success}
+              disabled={submitting}
             />
           </div>
 
@@ -118,18 +117,17 @@ export default function ChangePasswordForm({ open, onClose }: Props) {
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={submitting || success}
+              disabled={submitting}
             />
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
-          {success && <p className="text-sm text-green-600">Password changed successfully!</p>}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
               Cancel
             </Button>
-            <Button type="submit" disabled={submitting || success}>
+            <Button type="submit" disabled={submitting}>
               {submitting ? "Changing..." : "Change Password"}
             </Button>
           </DialogFooter>

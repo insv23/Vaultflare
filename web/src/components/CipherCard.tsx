@@ -1,5 +1,5 @@
-// input: context/vault.tsx (DecryptedCipher) + lucide-react 图标 + shadcn Button
-// output: CipherCard — 彩色首字母头像 + 字段行布局，每行独立操作按钮（copy/eye/外链）
+// input: context/vault.tsx (DecryptedCipher) + lucide-react 图标 + shadcn Button + sonner toast
+// output: CipherCard — 彩色首字母头像 + 字段行布局，每行独立操作按钮（copy+toast/eye/外链）
 // pos: Vault 页面列表的基础单元，被 pages/Vault.tsx 渲染
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import type { DecryptedCipher } from "@/context/vault";
 
 type Props = {
@@ -38,6 +39,7 @@ export default function CipherCard({ cipher, onEdit, onDelete }: Props) {
 
   async function handleCopy(text: string, field: "username" | "password") {
     await navigator.clipboard.writeText(text);
+    toast("Copied to clipboard");
     setCopiedField(field);
     setTimeout(async () => {
       setCopiedField(null);
