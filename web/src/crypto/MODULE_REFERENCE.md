@@ -9,4 +9,4 @@
 |------|------|------|
 | argon2.ts | 密码学链条第一环 | Argon2id 封装，从主密码+salt派生 32 字节 IKM |
 | keys.ts | 密码学链条第二环 | HKDF-SHA256 密钥派生，IKM → MasterKey + AuthKey；附带 base64 工具 |
-| vault.ts | 密码学链条第三环 | AES-256-GCM 加密/解密密码条目，每条独立 DEK；CipherData 仅 name 必填，其余字段可选 |
+| vault.ts | 密码学链条第三环 | AES-256-GCM 加密/解密密码条目，每条独立 DEK；CipherData 仅 name 必填，其余字段可选；含 reEncryptDeks() 用于密码修改时批量重加密 DEK |

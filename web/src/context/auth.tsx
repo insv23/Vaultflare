@@ -1,6 +1,6 @@
-// input: api/client.ts + crypto/{argon2,keys}
-// output: AuthProvider + useAuth() — 认证状态管理，暴露 register/login/logout/unlock
-// pos: 全局认证上下文，被所有需要认证状态的页面依赖；支持 Lock/Unlock 模式
+// input: api/client.ts + crypto/{argon2,keys,vault}
+// output: AuthProvider + useAuth() — 认证状态管理，暴露 register/login/logout/unlock/changePassword
+// pos: 全局认证上下文，被所有需要认证状态的页面依赖；支持 Lock/Unlock 模式和密码修改
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
 import {
@@ -31,7 +31,10 @@ import {
   type RegisterResponse,
   type ChallengeResponse,
   type VerifyResponse,
+  type ChangePasswordResponse,
+  type CipherListResponse,
 } from "@/api/client";
+import { reEncryptDeks } from "@/crypto/vault";
 
 // ---- sessionStorage 会话缓存 ----
 
@@ -110,6 +113,7 @@ type AuthState = {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   unlock: (password: string) => Promise<void>;
+  changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -237,6 +241,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const changePassword = useCallback(
+    async (oldPassword: string, newPassword: string) => {
+      if (!masterKey) throw new Error("Vault is locked");
+      setIsLoading(true);
+      try {
+        // 1. 用旧密码 + 缓存的 salt/params 派生 oldAuthKey
+        const oldSaltB64 = ssGet(SS_KDF_SALT);
+        const oldParamsJson = ssGet(SS_KDF_PARAMS);
+        if (!oldSaltB64 || !oldParamsJson) {
+          throw new Error("Session expired, please sign in again");
+        }
+        const oldSalt = base64ToUint8(oldSaltB64);
+        const oldKdfParams = JSON.parse(oldParamsJson) as KdfParams;
+        const oldIkm = await deriveIKM(oldPassword, oldSalt, oldKdfParams);
+        const oldAuthKey = await deriveAuthKey(oldIkm);
+
+        // 2. 新密码：生成新 salt，用 DEFAULT_KDF_PARAMS 派生
+        const newSalt = generateSalt();
+        const newIkm = await deriveIKM(newPassword, newSalt, DEFAULT_KDF_PARAMS);
+        const [newAuthKey, newMk] = await Promise.all([
+          deriveAuthKey(newIkm),
+          deriveMasterKey(newIkm),
+        ]);
+
+        // 3. 拉取最新密文列表
+        const { ciphers } = await apiFetch<CipherListResponse>("/api/ciphers");
+
+        // 4. 重新加密所有 DEK
+        const deks = await reEncryptDeks(
+          masterKey,
+          newMk,
+          ciphers.map((c) => ({
+            cipher_id: c.cipher_id,
+            encrypted_dek: c.encrypted_dek,
+          })),
+        );
+
+        // 5. 发送到服务端
+        const result = await apiFetch<ChangePasswordResponse>(
+          "/api/auth/password",
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              old_auth_key: oldAuthKey,
+              new_auth_key: newAuthKey,
+              new_kdf_salt: uint8ToBase64(newSalt),
+              new_kdf_params: toApiKdfParams(DEFAULT_KDF_PARAMS),
+              deks,
+            }),
+          },
+        );
+
+        // 6. 更新 sessionStorage + React state
+        ssSet(SS_TOKEN, result.access_token);
+        ssSet(SS_KDF_SALT, uint8ToBase64(newSalt));
+        ssSet(SS_KDF_PARAMS, JSON.stringify(DEFAULT_KDF_PARAMS));
+        ssSet(SS_VERIFY, await encryptVerifier(newMk));
+
+        tokenRef.current = result.access_token;
+        setToken(result.access_token);
+        setMasterKey(newMk);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [masterKey],
+  );
+
   const logout = useCallback(async () => {
     try {
       await apiFetch("/api/auth/logout", { method: "POST" });
@@ -264,6 +336,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         unlock,
+        changePassword,
       }}
     >
       {children}

@@ -30,6 +30,7 @@ app.doc("/openapi.json", {
 app.get("/docs", Scalar({ url: "/openapi.json" }));
 
 app.use("/api/auth/logout", authMiddleware);
+app.use("/api/auth/password", authMiddleware);
 app.use("/api/ciphers/*", authMiddleware);
 app.use("/api/ciphers", authMiddleware);
 

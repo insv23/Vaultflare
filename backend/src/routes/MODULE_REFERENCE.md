@@ -6,22 +6,24 @@
 
 ## `auth.ts`
 
-- 职责: 实现认证生命周期接口，包含注册、登录 challenge、登录 verify、登出。
+- 职责: 实现认证生命周期接口，包含注册、登录 challenge、登录 verify、登出、密码修改。
 - 输入:
   - `POST /api/auth/register`: `email`, `auth_key`, `kdf_salt`, `kdf_params`。
   - `POST /api/auth/login/challenge`: `email`。
   - `POST /api/auth/login/verify`: `email`, `auth_key`。
   - `POST /api/auth/logout`: 来自 `authMiddleware` 注入的 `sessionToken`。
+  - `PUT /api/auth/password`: `old_auth_key`, `new_auth_key`, `new_kdf_salt`, `new_kdf_params`, `deks[]`。
 - 输出:
   - 注册成功返回 `user_id/email/vault_version`。
   - challenge 返回 `kdf_salt/kdf_params/vault_version` 供客户端派生密钥。
   - verify 返回 `Bearer access_token` 和过期时间。
   - logout 返回 `logged_out: true`。
+  - 密码修改返回新 `Bearer access_token`、过期时间、`vault_version`。
 - 依赖:
-  - `utils/user-helper`（用户查询）
+  - `utils/user-helper`（用户查询，含 `findUserById`）
   - `utils/crypto`（token/时间/安全比较）
   - `utils/response`（统一错误结构）
-  - D1 `users/sessions` 表
+  - D1 `users/sessions/ciphers` 表
 - 错误处理:
   - 重复邮箱返回 `409 email_already_exists`。
   - 凭据错误返回 `401 invalid_credentials`。
@@ -30,6 +32,7 @@
   - 邮箱比较统一 `trim + lowercase`，不处理会导致重复账号绕过唯一性预期。
   - `kdf_params` 读取失败时回退为空对象，客户端需容忍该场景。
   - 路由响应状态码与 `createRoute.responses` 必须一致，否则 `RouteHandler` 类型不通过。
+  - 密码修改使用 D1 `batch()` 原子更新用户凭据、重加密 DEK、吊销旧会话、创建新会话。
 
 ## `ciphers.ts`
 

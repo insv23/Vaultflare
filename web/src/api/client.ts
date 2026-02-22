@@ -1,5 +1,5 @@
 // input: 无外部依赖，纯 fetch 封装
-// output: apiFetch() 通用请求函数 + API 类型定义（Auth + Cipher）+ KDF 参数映射
+// output: apiFetch() 通用请求函数 + API 类型定义（Auth + Cipher + ChangePassword）+ KDF 参数映射
 // pos: API 层基础设施，被 context/auth.tsx 和 context/vault.tsx 依赖
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -89,6 +89,24 @@ export type VerifyRequest = {
 };
 
 export type VerifyResponse = {
+  access_token: string;
+  token_type: "Bearer";
+  expires_at: number;
+  user_id: string;
+  vault_version: number;
+};
+
+// ---- Change Password 类型 ----
+
+export type ChangePasswordRequest = {
+  old_auth_key: string;
+  new_auth_key: string;
+  new_kdf_salt: string;
+  new_kdf_params: { iterations?: number; memory?: number; parallelism?: number };
+  deks: Array<{ cipher_id: string; encrypted_dek: string }>;
+};
+
+export type ChangePasswordResponse = {
   access_token: string;
   token_type: "Bearer";
   expires_at: number;

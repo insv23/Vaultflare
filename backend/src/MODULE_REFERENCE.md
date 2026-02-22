@@ -24,7 +24,7 @@
   - 所有抛出的异常统一走 `app.onError -> handleError`。
   - 请求验证失败由 `defaultHook: validationHook` 统一转为 `400`。
 - 边界条件:
-  - `authMiddleware` 仅挂到受保护路径，公开路径（`/health`、`/docs`、`/openapi.json`、注册/登录）不鉴权。
+  - `authMiddleware` 挂到 `/api/auth/logout`、`/api/auth/password`、`/api/ciphers*` 三处，公开路径（`/health`、`/docs`、`/openapi.json`、注册/登录）不鉴权。
   - 新增受保护路由时，必须同步在此文件挂载中间件，否则会出现未鉴权访问。
 
 ## `routes/`

@@ -1,6 +1,6 @@
 // input: keys.ts 的 MasterKey (CryptoKey) + base64 工具
-// output: encryptCipher() / decryptCipher() — 加密/解密密码条目
-// pos: 密码学链条第三环，被 context/vault.tsx 依赖，是数据进出浏览器的加密门
+// output: encryptCipher() / decryptCipher() / reEncryptDeks() — 加密/解密/重加密
+// pos: 密码学链条第三环，被 context/vault.tsx 和 context/auth.tsx 依赖，是数据进出浏览器的加密门
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
 import { uint8ToBase64, base64ToUint8 } from "./keys";
@@ -138,4 +138,27 @@ export async function decryptCipher(
   // 2. 用 DEK 解密数据
   const plaintext = await aesGcmDecrypt(dek, encrypted_data);
   return JSON.parse(DECODER.decode(plaintext)) as CipherData;
+}
+
+/**
+ * 用旧 MasterKey 解密所有 DEK，再用新 MasterKey 重新加密。
+ * encrypted_data 完全不动，只替换 encrypted_dek。
+ *
+ * @param oldMasterKey  当前的 MasterKey
+ * @param newMasterKey  新密码派生的 MasterKey
+ * @param ciphers       需要重加密的 cipher 列表（cipher_id + encrypted_dek）
+ * @returns 重加密后的 { cipher_id, encrypted_dek } 数组
+ */
+export async function reEncryptDeks(
+  oldMasterKey: CryptoKey,
+  newMasterKey: CryptoKey,
+  ciphers: Array<{ cipher_id: string; encrypted_dek: string }>,
+): Promise<Array<{ cipher_id: string; encrypted_dek: string }>> {
+  return Promise.all(
+    ciphers.map(async ({ cipher_id, encrypted_dek }) => {
+      const dekRaw = await aesGcmDecrypt(oldMasterKey, encrypted_dek);
+      const newEncryptedDek = await aesGcmEncrypt(newMasterKey, dekRaw);
+      return { cipher_id, encrypted_dek: newEncryptedDek };
+    }),
+  );
 }

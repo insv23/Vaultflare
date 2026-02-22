@@ -17,7 +17,7 @@ import {
   sessionExpiresAtMs,
 } from "../utils/crypto";
 import { errorPayload } from "../utils/response";
-import { findUserByEmail } from "../utils/user-helper";
+import { findUserByEmail, findUserById } from "../utils/user-helper";
 
 const ErrorSchema = z
   .object({
@@ -92,6 +92,33 @@ const LogoutResponseSchema = z
     logged_out: z.literal(true),
   })
   .openapi("LogoutResponse");
+
+const DekUpdateSchema = z
+  .object({
+    cipher_id: z.uuid(),
+    encrypted_dek: z.string().min(1),
+  })
+  .openapi("DekUpdate");
+
+const ChangePasswordRequestSchema = z
+  .object({
+    old_auth_key: z.string().min(16),
+    new_auth_key: z.string().min(16),
+    new_kdf_salt: z.string().min(16),
+    new_kdf_params: KdfParamsSchema,
+    deks: z.array(DekUpdateSchema),
+  })
+  .openapi("ChangePasswordRequest");
+
+const ChangePasswordResponseSchema = z
+  .object({
+    access_token: z.string(),
+    token_type: z.literal("Bearer"),
+    expires_at: z.number().int().positive(),
+    user_id: z.uuid(),
+    vault_version: z.number().int().nonnegative(),
+  })
+  .openapi("ChangePasswordResponse");
 
 const registerRoute = createRoute({
   method: "post",
@@ -214,6 +241,41 @@ const logoutRoute = createRoute({
     },
     401: {
       description: "Unauthorized",
+      content: { "application/json": { schema: ErrorSchema } },
+    },
+  },
+});
+
+const changePasswordRoute = createRoute({
+  method: "put",
+  path: "/api/auth/password",
+  tags: ["Auth"],
+  summary: "Change master password",
+  request: {
+    body: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: ChangePasswordRequestSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Password changed",
+      content: {
+        "application/json": {
+          schema: ChangePasswordResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Validation failed",
+      content: { "application/json": { schema: ErrorSchema } },
+    },
+    401: {
+      description: "Invalid old password",
       content: { "application/json": { schema: ErrorSchema } },
     },
   },
@@ -351,8 +413,90 @@ export const registerAuthRoutes = (app: OpenAPIHono<AppEnv>) => {
     return c.json({ logged_out: true as const }, 200);
   };
 
+  const changePasswordHandler: RouteHandler<
+    typeof changePasswordRoute,
+    AppEnv
+  > = async (c) => {
+    const userId = c.get("userId");
+    const body = c.req.valid("json");
+
+    const user = await findUserById(c.env.DB, userId);
+    if (!user || !secureCompare(user.auth_key, body.old_auth_key)) {
+      return c.json(
+        errorPayload("invalid_credentials", "Invalid old password"),
+        401,
+      );
+    }
+
+    const now = nowMs();
+    const token = generateSessionToken();
+    const expiresAt = sessionExpiresAtMs();
+    const newSessionId = crypto.randomUUID();
+
+    // Build batch statements
+    const statements: D1PreparedStatement[] = [];
+
+    // 1. Update user credentials
+    statements.push(
+      c.env.DB.prepare(
+        `UPDATE users SET auth_key = ?, kdf_salt = ?, kdf_params = ?, updated_at = ?
+         WHERE id = ?`,
+      ).bind(
+        body.new_auth_key,
+        body.new_kdf_salt,
+        JSON.stringify(body.new_kdf_params),
+        now,
+        userId,
+      ),
+    );
+
+    // 2. Re-encrypt each DEK
+    for (const dek of body.deks) {
+      statements.push(
+        c.env.DB.prepare(
+          `UPDATE ciphers SET encrypted_dek = ?, updated_at = ?
+           WHERE id = ? AND user_id = ? AND deleted_at IS NULL`,
+        ).bind(dek.encrypted_dek, now, dek.cipher_id, userId),
+      );
+    }
+
+    // 3. Revoke all existing sessions
+    statements.push(
+      c.env.DB.prepare(
+        `UPDATE sessions SET revoked_at = ?
+         WHERE user_id = ? AND revoked_at IS NULL`,
+      ).bind(now, userId),
+    );
+
+    // 4. Create new session
+    statements.push(
+      c.env.DB.prepare(
+        `INSERT INTO sessions (id, user_id, token, expires_at, revoked_at, created_at, updated_at)
+         VALUES (?, ?, ?, ?, NULL, ?, ?)`,
+      ).bind(newSessionId, userId, token, expiresAt, now, now),
+    );
+
+    await c.env.DB.batch(statements);
+
+    // Read final vault_version
+    const updated = await findUserById(c.env.DB, userId);
+    const vaultVersion = updated ? Number(updated.vault_version) : 0;
+
+    return c.json(
+      {
+        access_token: token,
+        token_type: "Bearer" as const,
+        expires_at: expiresAt,
+        user_id: userId,
+        vault_version: vaultVersion,
+      },
+      200,
+    );
+  };
+
   app.openapi(registerRoute, registerHandler);
   app.openapi(loginChallengeRoute, loginChallengeHandler);
   app.openapi(loginVerifyRoute, loginVerifyHandler);
   app.openapi(logoutRoute, logoutHandler);
+  app.openapi(changePasswordRoute, changePasswordHandler);
 };
