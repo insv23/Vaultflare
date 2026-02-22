@@ -6,5 +6,5 @@
 
 | 文件 | 地位 | 功能 |
 |------|------|------|
-| auth.tsx | 认证上下文 | AuthProvider + useAuth()，管理 token/masterKey/userId，暴露 register/login/logout |
+| auth.tsx | 认证上下文 | AuthProvider + useAuth()，管理 token/masterKey/userId/email，暴露 register/login/logout/unlock；支持 Lock/Unlock 模式（sessionStorage 缓存 token 和 KDF 参数，密钥不落盘） |
 | vault.tsx | 密码库上下文 | VaultProvider + useVault()，管理解密后的 ciphers 列表，暴露 fetchAll/createCipher/updateCipher/deleteCipher |

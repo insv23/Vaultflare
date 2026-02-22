@@ -8,11 +8,13 @@ import { AuthProvider, useAuth } from "@/context/auth";
 import { VaultProvider } from "@/context/vault";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Unlock from "@/pages/Unlock";
 import Vault from "@/pages/Vault";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { token } = useAuth();
+  const { token, isLocked } = useAuth();
   if (!token) return <Navigate to="/login" replace />;
+  if (isLocked) return <Navigate to="/unlock" replace />;
   return children;
 }
 
@@ -21,6 +23,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/unlock" element={<Unlock />} />
       <Route
         path="/vault"
         element={
