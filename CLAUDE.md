@@ -71,10 +71,13 @@ cd web && pnpm -s tsc --noEmit
 ### 工作流：先 Issue 再代码
 
 1. **开 Issue**：动手前用 `/issue` 创建设计 Issue，明确目标和方案
-2. **写代码**：实现方案，commit message 中引用 Issue
-3. **提交**：用 `/ship` 提交代码，最终 commit 用 `closes #N` 自动关闭 Issue
+2. **写代码**：实现方案，中间 commit 带 `refs #N`
+3. **提交**：用 `/ship` 提交代码
 
-### Commit 关联 Issue
-- 进行中的 commit：`refs #N`
-- 完成任务的 commit：`closes #N`
-- PR body 里写 `Closes #N` 自动关联并关闭 Issue
+### Commit 必须关联 Issue（硬性要求）
+
+- 每次用 `/ship` 提交前，**必须** 检查当前工作是否对应某个 open Issue
+- 中间过程的 commit：message 末尾加 `refs #N`
+- 完成任务的最终 commit：message 末尾加 `closes #N`
+- 如果一次 commit 完成了多个 Issue：`closes #1, closes #2`
+- **禁止** 提交与 Issue 相关的代码却不带关联关键词
