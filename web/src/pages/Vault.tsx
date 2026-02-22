@@ -1,16 +1,17 @@
-// input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + PasswordGeneratorOptions + shadcn Dialog
-// output: Vault 主页 — 密码列表、搜索、CRUD 操作、删除确认、独立密码生成器弹窗
+// input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + ChangePasswordForm + PasswordGeneratorOptions + shadcn Dialog
+// output: Vault 主页 — 密码列表、搜索、CRUD 操作、删除确认、独立密码生成器弹窗、修改主密码弹窗
 // pos: /vault 路由，登录后落地页，密码库的核心交互界面
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
 import { useState, useCallback } from "react";
-import { Plus, LogOut, Search, Loader2, Dices, Copy, Check, RefreshCw } from "lucide-react";
+import { Plus, LogOut, Search, Loader2, Dices, Copy, Check, RefreshCw, KeyRound } from "lucide-react";
 import { useAuth } from "@/context/auth";
 import { useVault, type DecryptedCipher, type CipherData } from "@/context/vault";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CipherCard from "@/components/CipherCard";
 import CipherForm from "@/components/CipherForm";
+import ChangePasswordForm from "@/components/ChangePasswordForm";
 import PasswordGeneratorOptions from "@/components/PasswordGeneratorOptions";
 import { generatePassword, DEFAULT_PASSWORD_OPTIONS, type PasswordOptions } from "@/lib/generate-password";
 import {
@@ -31,6 +32,9 @@ export default function Vault() {
   const [editingCipher, setEditingCipher] = useState<DecryptedCipher | null>(null);
   const [deletingCipher, setDeletingCipher] = useState<DecryptedCipher | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Change Password Dialog
+  const [changePwOpen, setChangePwOpen] = useState(false);
 
   // Password Generator Dialog
   const [genOpen, setGenOpen] = useState(false);
@@ -118,6 +122,9 @@ export default function Vault() {
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={handleGenOpen} title="Password generator">
             <Dices className="size-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => setChangePwOpen(true)} title="Change password">
+            <KeyRound className="size-4" />
           </Button>
           <Button size="icon" onClick={handleAdd} title="Add password">
             <Plus className="size-4" />
@@ -228,6 +235,9 @@ export default function Vault() {
           <PasswordGeneratorOptions options={genOptions} onChange={handleGenOptionsChange} />
         </DialogContent>
       </Dialog>
+
+      {/* Change Password */}
+      <ChangePasswordForm open={changePwOpen} onClose={() => setChangePwOpen(false)} />
     </div>
   );
 }
