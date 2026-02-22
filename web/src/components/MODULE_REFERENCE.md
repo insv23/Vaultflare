@@ -12,5 +12,5 @@ shadcn/ui 生成的基础组件，被 pages/ 使用。
 | ui/card.tsx | 基础组件 | Card 容器组件（Card/CardHeader/CardTitle/CardDescription/CardContent/CardFooter） |
 | ui/dialog.tsx | 基础组件 | Dialog 弹窗组件（Dialog/DialogContent/DialogHeader/DialogTitle/DialogDescription/DialogFooter） |
 | ui/textarea.tsx | 基础组件 | Textarea 多行输入框 |
-| CipherCard.tsx | 业务组件 | 单条密码条目卡片，展示 name，username/password/uri 按存在性条件渲染，提供 edit/delete 操作 |
+| CipherCard.tsx | 业务组件 | 单条密码条目卡片，彩色首字母头像 + 字段行布局（user/pass/url/notes），每行独立操作按钮（copy/eye/外链），密码可切换明文 |
 | CipherForm.tsx | 业务组件 | 新增/编辑密码条目的 Dialog 表单，仅 name 必填，其余可选（至少填一个），统一 create 和 edit 两种模式 |

@@ -114,7 +114,7 @@ export default function Vault() {
           {searchQuery ? "No results found" : "No passwords yet"}
         </p>
       ) : (
-        <div className="grid gap-2">
+        <div className="grid gap-3">
           {filtered.map((c) => (
             <CipherCard
               key={c.cipher_id}
