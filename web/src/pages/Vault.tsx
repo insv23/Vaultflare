@@ -62,14 +62,21 @@ export default function Vault() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  // 前端搜索过滤（大小写不敏感）
+  // 前端搜索过滤（大小写不敏感，加权排序）
   const query = searchQuery.toLowerCase();
   const filtered = query
-    ? ciphers.filter(
-        (c) =>
-          c.data.name.toLowerCase().includes(query) ||
-          (c.data.username?.toLowerCase().includes(query) ?? false),
-      )
+    ? ciphers
+        .map((c) => {
+          let score = 0;
+          if (c.data.name.toLowerCase().includes(query)) score += 4;
+          if (c.data.uri?.toLowerCase().includes(query)) score += 3;
+          if (c.data.username?.toLowerCase().includes(query)) score += 2;
+          if (c.data.notes?.toLowerCase().includes(query)) score += 1;
+          return { cipher: c, score };
+        })
+        .filter((item) => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map((item) => item.cipher)
     : ciphers;
 
   function handleAdd() {
