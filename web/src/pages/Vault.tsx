@@ -1,16 +1,18 @@
-// input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + shadcn Dialog
-// output: Vault 主页 — 密码列表、搜索（兼容可选字段）、CRUD 操作、删除确认
+// input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + PasswordGeneratorOptions + shadcn Dialog
+// output: Vault 主页 — 密码列表、搜索、CRUD 操作、删除确认、独立密码生成器弹窗
 // pos: /vault 路由，登录后落地页，密码库的核心交互界面
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
-import { useState } from "react";
-import { Plus, LogOut, Search, Loader2 } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Plus, LogOut, Search, Loader2, Dices, Copy, Check, RefreshCw } from "lucide-react";
 import { useAuth } from "@/context/auth";
 import { useVault, type DecryptedCipher, type CipherData } from "@/context/vault";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CipherCard from "@/components/CipherCard";
 import CipherForm from "@/components/CipherForm";
+import PasswordGeneratorOptions from "@/components/PasswordGeneratorOptions";
+import { generatePassword, DEFAULT_PASSWORD_OPTIONS, type PasswordOptions } from "@/lib/generate-password";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +31,36 @@ export default function Vault() {
   const [editingCipher, setEditingCipher] = useState<DecryptedCipher | null>(null);
   const [deletingCipher, setDeletingCipher] = useState<DecryptedCipher | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Password Generator Dialog
+  const [genOpen, setGenOpen] = useState(false);
+  const [genOptions, setGenOptions] = useState<PasswordOptions>(DEFAULT_PASSWORD_OPTIONS);
+  const [genPassword, setGenPassword] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const regenerate = useCallback((opts: PasswordOptions) => {
+    setGenPassword(generatePassword(opts));
+  }, []);
+
+  function handleGenOpen() {
+    const opts = { ...DEFAULT_PASSWORD_OPTIONS };
+    setGenOptions(opts);
+    setGenPassword(generatePassword(opts));
+    setCopied(false);
+    setGenOpen(true);
+  }
+
+  function handleGenOptionsChange(opts: PasswordOptions) {
+    setGenOptions(opts);
+    regenerate(opts);
+    setCopied(false);
+  }
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(genPassword);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   // 前端搜索过滤（大小写不敏感）
   const query = searchQuery.toLowerCase();
@@ -77,6 +109,9 @@ export default function Vault() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Vault</h1>
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={handleGenOpen} title="Password generator">
+            <Dices className="size-4" />
+          </Button>
           <Button size="icon" onClick={handleAdd} title="Add password">
             <Plus className="size-4" />
           </Button>
@@ -151,6 +186,39 @@ export default function Vault() {
               {deleteLoading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Generator */}
+      <Dialog open={genOpen} onOpenChange={(v) => !v && setGenOpen(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Password Generator</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex items-center gap-2">
+            <code className="flex-1 rounded-md border bg-muted/50 px-3 py-2 font-mono text-sm break-all select-all">
+              {genPassword}
+            </code>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => { regenerate(genOptions); setCopied(false); }}
+              title="Regenerate"
+            >
+              <RefreshCw className="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCopy}
+              title="Copy"
+            >
+              {copied ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
+            </Button>
+          </div>
+
+          <PasswordGeneratorOptions options={genOptions} onChange={handleGenOptionsChange} />
         </DialogContent>
       </Dialog>
     </div>

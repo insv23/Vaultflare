@@ -9,4 +9,4 @@
 | Register.tsx | /register 路由 | 注册表单，Argon2id 派生密钥后调用注册 API |
 | Login.tsx | /login 路由 | 登录表单，两步认证对用户透明 |
 | Unlock.tsx | /unlock 路由 | 锁定后快速解锁，只需主密码，无网络请求 |
-| Vault.tsx | /vault 路由 | 密码库主页，搜索过滤（兼容可选字段）+ 密码列表 + CRUD（新增/编辑/删除/复制）操作 |
+| Vault.tsx | /vault 路由 | 密码库主页，搜索过滤 + 密码列表 + CRUD 操作 + 独立密码生成器弹窗 |

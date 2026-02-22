@@ -1,10 +1,10 @@
-// input: shadcn Dialog + Input + Textarea + lucide-react
-// output: CipherForm — 新增/编辑密码条目的 Dialog 表单，仅 name 必填，其余字段可选（至少填一个）
+// input: shadcn Dialog + Input + Textarea + lucide-react + PasswordGeneratorOptions + generate-password
+// output: CipherForm — 新增/编辑密码条目的 Dialog 表单，仅 name 必填，其余可选，内嵌密码生成器
 // pos: 被 pages/Vault.tsx 调用，统一处理 create 和 edit 场景
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
 import { useState, useEffect, type FormEvent } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Dices } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import type { CipherData } from "@/context/vault";
+import PasswordGeneratorOptions from "@/components/PasswordGeneratorOptions";
+import { generatePassword, DEFAULT_PASSWORD_OPTIONS, type PasswordOptions } from "@/lib/generate-password";
 
 type Props = {
   open: boolean;
@@ -33,6 +35,8 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
   const [uri, setUri] = useState("");
   const [notes, setNotes] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showGenerator, setShowGenerator] = useState(false);
+  const [genOptions, setGenOptions] = useState<PasswordOptions>(DEFAULT_PASSWORD_OPTIONS);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -45,9 +49,28 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
       setUri(initialData?.uri ?? "");
       setNotes(initialData?.notes ?? "");
       setShowPassword(false);
+      setShowGenerator(false);
+      setGenOptions(DEFAULT_PASSWORD_OPTIONS);
       setError(null);
     }
   }, [open, initialData]);
+
+  function handleGenToggle() {
+    if (!showGenerator) {
+      // Opening: generate and fill
+      const pw = generatePassword(genOptions);
+      setPassword(pw);
+      setShowPassword(true);
+    }
+    setShowGenerator(!showGenerator);
+  }
+
+  function handleGenOptionsChange(opts: PasswordOptions) {
+    setGenOptions(opts);
+    const pw = generatePassword(opts);
+    setPassword(pw);
+    setShowPassword(true);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -102,19 +125,33 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pr-10"
+                className="pr-20"
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-0 top-0 h-full"
-                onClick={() => setShowPassword(!showPassword)}
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </Button>
+              <div className="absolute right-0 top-0 flex h-full">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleGenToggle}
+                  tabIndex={-1}
+                  title="Generate password"
+                >
+                  <Dices className="size-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </Button>
+              </div>
             </div>
+            {showGenerator && (
+              <PasswordGeneratorOptions options={genOptions} onChange={handleGenOptionsChange} />
+            )}
           </div>
 
           <div className="grid gap-2">
