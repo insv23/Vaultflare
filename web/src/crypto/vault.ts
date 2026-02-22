@@ -11,9 +11,9 @@ const IV_LENGTH = 12; // AES-GCM 标准 IV 长度
 
 /** 加密前的明文数据结构 */
 export type CipherData = {
-  name: string;
-  username: string;
-  password: string;
+  name: string;        // 唯一必填 — 列表标识符
+  username?: string;
+  password?: string;
   uri?: string;
   notes?: string;
 };

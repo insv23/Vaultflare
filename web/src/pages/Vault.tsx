@@ -1,5 +1,5 @@
 // input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + shadcn Dialog
-// output: Vault 主页 — 密码列表、搜索、CRUD 操作、删除确认
+// output: Vault 主页 — 密码列表、搜索（兼容可选字段）、CRUD 操作、删除确认
 // pos: /vault 路由，登录后落地页，密码库的核心交互界面
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -36,7 +36,7 @@ export default function Vault() {
     ? ciphers.filter(
         (c) =>
           c.data.name.toLowerCase().includes(query) ||
-          c.data.username.toLowerCase().includes(query),
+          (c.data.username?.toLowerCase().includes(query) ?? false),
       )
     : ciphers;
 

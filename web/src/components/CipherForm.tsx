@@ -1,5 +1,5 @@
 // input: shadcn Dialog + Input + Textarea + lucide-react
-// output: CipherForm — 新增/编辑密码条目的 Dialog 表单
+// output: CipherForm — 新增/编辑密码条目的 Dialog 表单，仅 name 必填，其余字段可选（至少填一个）
 // pos: 被 pages/Vault.tsx 调用，统一处理 create 和 edit 场景
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -54,10 +54,16 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
     setError(null);
     setSubmitting(true);
     try {
+      const hasContent = username.trim() || password || uri.trim() || notes.trim();
+      if (!hasContent) {
+        setError("至少填写一个字段（用户名、密码、URI 或备注）");
+        setSubmitting(false);
+        return;
+      }
       const data: CipherData = {
         name: name.trim(),
-        username: username.trim(),
-        password,
+        ...(username.trim() && { username: username.trim() }),
+        ...(password && { password }),
         ...(uri.trim() && { uri: uri.trim() }),
         ...(notes.trim() && { notes: notes.trim() }),
       };
@@ -85,7 +91,7 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
 
           <div className="grid gap-2">
             <Label htmlFor="cf-username">Username</Label>
-            <Input id="cf-username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+            <Input id="cf-username" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
 
           <div className="grid gap-2">
@@ -96,7 +102,6 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
                 className="pr-10"
               />
               <Button
