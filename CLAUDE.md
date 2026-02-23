@@ -28,7 +28,7 @@ Vaultflare/
 ```bash
 # Backend
 cd backend && pnpm dev      # 本地开发
-cd backend && pnpm deploy   # 部署到 Cloudflare
+cd backend && pnpm run deploy   # 部署到 Cloudflare
 cd backend && pnpm cf-typegen  # 生成 Cloudflare 类型
 ```
 
@@ -43,7 +43,7 @@ cd backend && pnpm -s tsc --noEmit
 每次改动web端代码后，必须执行以下命令进行类型检查：
 
 ```bash
-cd web && pnpm -s tsc --noEmit
+cd web && pnpm -s tsc -b --noEmit
 ```
 
 

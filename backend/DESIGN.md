@@ -349,7 +349,7 @@ z.string().min(5, { error: "Too short." })  // v4 用 error
 pnpm dev              # 启动本地开发服务器
 
 # 部署
-pnpm deploy           # 部署到 Cloudflare
+pnpm run deploy       # 部署到 Cloudflare
 
 # 类型生成
 pnpm cf-typegen       # 生成 Cloudflare Bindings 类型

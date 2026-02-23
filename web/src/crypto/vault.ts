@@ -36,7 +36,7 @@ async function aesGcmEncrypt(
   const ciphertext = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
     key,
-    plaintext,
+    plaintext as Uint8Array<ArrayBuffer>,
   );
   // 拼接 IV + ciphertext
   const combined = new Uint8Array(IV_LENGTH + ciphertext.byteLength);
@@ -78,7 +78,7 @@ async function generateDEK(): Promise<CryptoKey> {
  * 将 CryptoKey 导入为可用于加密的 AES-GCM 密钥。
  */
 async function importAesKey(raw: Uint8Array): Promise<CryptoKey> {
-  return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, true, [
+  return crypto.subtle.importKey("raw", raw as Uint8Array<ArrayBuffer>, { name: "AES-GCM" }, true, [
     "encrypt",
     "decrypt",
   ]);

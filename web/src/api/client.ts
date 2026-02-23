@@ -17,13 +17,14 @@ export function setTokenGetter(fn: () => string | null) {
 // ---- 错误类型 ----
 
 export class ApiRequestError extends Error {
-  constructor(
-    public status: number,
-    public code: string,
-    message: string,
-  ) {
+  status: number;
+  code: string;
+
+  constructor(status: number, code: string, message: string) {
     super(message);
     this.name = "ApiRequestError";
+    this.status = status;
+    this.code = code;
   }
 }
 

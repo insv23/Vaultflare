@@ -109,7 +109,7 @@ app.openapi(route, (c) => {
 
 ```bash
 pnpm dev        # 本地开发
-pnpm deploy     # 部署到 Cloudflare
+pnpm run deploy # 部署到 Cloudflare
 pnpm cf-typegen # 生成 Cloudflare Bindings 类型
 ```
 
@@ -123,5 +123,5 @@ pnpm cf-typegen # 生成 Cloudflare Bindings 类型
 每次改动后端代码后，必须执行以下命令进行类型检查：
 
 ```bash
-cd backend && pnpm -s tsc --noEmit
+cd backend && pnpm -s tsc -b --noEmit
 ```

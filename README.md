@@ -68,7 +68,7 @@ npx wrangler d1 execute vaultflare --remote --file=db/schema.sql
 **Deploy:**
 
 ```bash
-pnpm deploy
+pnpm run deploy
 ```
 
 ### 3. Deploy the web frontend
@@ -76,21 +76,20 @@ pnpm deploy
 ```bash
 cd ../web
 pnpm install
-pnpm deploy
+pnpm run deploy
 ```
 
 ### 4. Bind to your domain
 
-In the Cloudflare dashboard, add two **Workers Routes** under your domain:
+**Add a DNS record** in the Cloudflare dashboard (your domain → DNS → Records):
 
-| Route pattern | Worker |
-|---|---|
-| `your-domain.com/api/*` | `backend` |
-| `your-domain.com/*` | `vaultflare-web` |
+| Type | Name | Content | Proxy |
+|---|---|---|---|
+| `AAAA` | `your-subdomain` | `100::` | Proxied (orange cloud) |
 
-> **Order matters.** The more specific `/api/*` route must be listed first (or Cloudflare will match `/*` and send API requests to the web worker).
+> Workers don't need a real origin IP. The `AAAA 100::` record is a Cloudflare convention to activate the proxy so Workers Routes can take effect.
 
-Alternatively, set routes in each project's `wrangler.jsonc`:
+**Set routes** in each project's `wrangler.jsonc` (replace `your-domain.com` with your actual domain):
 
 **backend/wrangler.jsonc:**
 ```jsonc
@@ -106,7 +105,7 @@ Alternatively, set routes in each project's `wrangler.jsonc`:
 ]
 ```
 
-Then re-deploy both workers for routes to take effect.
+Then re-deploy both workers (`pnpm run deploy` in each directory) for routes to take effect.
 
 ### 5. Configuration
 

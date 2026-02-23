@@ -9,7 +9,7 @@ const ENCODER = new TextEncoder();
  * 将 IKM 导入为 HKDF base key（Web Crypto 要求先 importKey）。
  */
 async function importIKM(ikm: Uint8Array): Promise<CryptoKey> {
-  return crypto.subtle.importKey("raw", ikm, "HKDF", false, [
+  return crypto.subtle.importKey("raw", ikm as Uint8Array<ArrayBuffer>, "HKDF", false, [
     "deriveKey",
     "deriveBits",
   ]);
