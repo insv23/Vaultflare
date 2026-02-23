@@ -19,3 +19,4 @@ shadcn/ui 生成的基础组件，被 pages/ 使用。
 | CipherForm.tsx | 业务组件 | 新增/编辑密码条目的 Dialog 表单，仅 name 必填，其余可选（至少填一个），统一 create 和 edit 两种模式，内嵌密码生成器 |
 | ChangePasswordForm.tsx | 业务组件 | 修改主密码的 Dialog 表单，三个密码输入框 + 客户端校验 + changePassword API 调用，被 Vault toolbar 触发 |
 | PasswordGeneratorOptions.tsx | 业务组件 | 密码生成选项面板（长度滑块 + 4 个字符类型勾选框），被 Vault 独立弹窗和 CipherForm 共享 |
+| PasswordStrengthBar.tsx | 业务组件 | 密码强度可视化指示器（彩色进度条 + 等级文字 + 改进建议），基于 zxcvbn-ts 懒加载评估，被 Register/CipherForm/ChangePasswordForm 共用 |

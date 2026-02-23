@@ -1,5 +1,5 @@
-// input: shadcn Dialog + Input + Textarea + lucide-react + PasswordGeneratorOptions + generate-password
-// output: CipherForm — 新增/编辑密码条目的 Dialog 表单，仅 name 必填，其余可选，内嵌密码生成器
+// input: shadcn Dialog + Input + Textarea + lucide-react + PasswordGeneratorOptions + generate-password + PasswordStrengthBar
+// output: CipherForm — 新增/编辑密码条目的 Dialog 表单，仅 name 必填，其余可选，内嵌密码生成器 + 密码强度指示器
 // pos: 被 pages/Vault.tsx 调用，统一处理 create 和 edit 场景
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -19,6 +19,7 @@ import {
 import type { CipherData } from "@/context/vault";
 import PasswordGeneratorOptions from "@/components/PasswordGeneratorOptions";
 import { generatePassword, DEFAULT_PASSWORD_OPTIONS, type PasswordOptions } from "@/lib/generate-password";
+import PasswordStrengthBar from "@/components/PasswordStrengthBar";
 
 type Props = {
   open: boolean;
@@ -79,7 +80,7 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
     try {
       const hasContent = username.trim() || password || uri.trim() || notes.trim();
       if (!hasContent) {
-        setError("至少填写一个字段（用户名、密码、URI 或备注）");
+        setError("Fill in at least one field (username, password, URI, or notes)");
         setSubmitting(false);
         return;
       }
@@ -149,6 +150,7 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
                 </Button>
               </div>
             </div>
+            <PasswordStrengthBar password={password} />
             {showGenerator && (
               <PasswordGeneratorOptions options={genOptions} onChange={handleGenOptionsChange} />
             )}
