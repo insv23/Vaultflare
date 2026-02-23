@@ -6,6 +6,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 
 import { authMiddleware } from "./middleware/auth";
+import { rateLimitMiddleware } from "./middleware/rate-limit";
 import { registerAuthRoutes } from "./routes/auth";
 import { registerCipherRoutes } from "./routes/ciphers";
 import type { AppEnv } from "./types";
@@ -28,6 +29,12 @@ app.doc("/openapi.json", {
 });
 
 app.get("/docs", Scalar({ url: "/openapi.json" }));
+
+const loginRateLimit = rateLimitMiddleware(10, 60, "/api/auth/login");
+const registerRateLimit = rateLimitMiddleware(3, 60, "/api/auth/register");
+
+app.use("/api/auth/login/*", loginRateLimit);
+app.use("/api/auth/register", registerRateLimit);
 
 app.use("/api/auth/logout", authMiddleware);
 app.use("/api/auth/password", authMiddleware);

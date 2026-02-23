@@ -16,6 +16,9 @@
 	"vars": {
 		"ALLOW_REGISTRATION": "true"
 	},
+	"routes": [
+		{ "pattern": "vftest.insv.xyz/*", "zone_name": "insv.xyz" }
+	],
 	// "kv_namespaces": [
 	//   {
 	//     "binding": "MY_KV_NAMESPACE",

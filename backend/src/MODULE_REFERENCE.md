@@ -46,12 +46,12 @@
 
 ## `middleware/`
 
-- 职责: 请求前置拦截与上下文注入。
-- 输入: HTTP Header（尤其 `Authorization`）。
-- 输出: 在 `c` 上写入 `userId/sessionToken`，供后续 handler 使用。
+- 职责: 请求前置拦截——会话鉴权与速率限制。
+- 输入: HTTP Header（`Authorization`、`CF-Connecting-IP`）和 Cloudflare Rate Limit Binding。
+- 输出: 鉴权中间件在 `c` 上写入 `userId/sessionToken`；限速中间件在超限时抛 429。
 - 依赖: `utils/crypto`、`utils/response`、`types`。
-- 错误处理: 鉴权失败抛 `AppError`，由全局错误处理转换为标准响应。
-- 边界条件: 若新增 token 形态（非 Bearer）需在此扩展，否则会全部返回 `401`。
+- 错误处理: 鉴权失败抛 `AppError 401`，限速超限抛 `AppError 429`，由全局错误处理转换为标准响应。
+- 边界条件: 若新增 token 形态（非 Bearer）需在 `auth.ts` 扩展；新增限速端点需在 `index.ts` 挂载对应中间件。
 
 ## `utils/`
 

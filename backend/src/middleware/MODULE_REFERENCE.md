@@ -2,7 +2,7 @@
 
 > 一旦我所属的文件夹有所变化，请更新我。
 
-`backend/src/middleware` 负责请求链路前置控制，当前只处理会话鉴权。
+`backend/src/middleware` 负责请求链路前置控制，包含会话鉴权和速率限制。
 
 ## `auth.ts`
 
@@ -25,3 +25,22 @@
   - 只接受前缀精确为 `Bearer ` 的头；大小写和其他方案不会被接受。
   - token 会 `trim`，可容忍尾部空格。
   - 如果 session 数据异常（例如 `expires_at` 非法），会走过期判断并被拒绝。
+
+## `rate-limit.ts`
+
+- 职责: 工厂函数，生成基于 D1 计数的限速中间件。
+- 输入:
+  - `CF-Connecting-IP` 请求头（作为限速 key）。
+  - `limit`（限额）、`period`（窗口秒数）、`keyPrefix`（端点标识）。
+  - D1 `rate_limits` 表做计数存储。
+- 输出:
+  - 限速通过则调用 `next()` 放行。
+  - 超限则抛 `AppError(429, "rate_limit_exceeded")`。
+- 依赖:
+  - `types.AppEnv`（通过 `c.env.DB` 访问 D1）
+  - `utils/response.AppError`
+- 错误处理:
+  - 超限 -> 抛 `429 rate_limit_exceeded`，由全局 `handleError` 转换为标准响应。
+- 边界条件:
+  - 无 `CF-Connecting-IP` 头时回退为 `"unknown"`，所有无 IP 请求共享同一限速桶。
+  - 过期 window 行不会自动清理，需要定期手动或 Cron 清理。

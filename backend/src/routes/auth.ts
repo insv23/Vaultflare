@@ -156,6 +156,10 @@ const registerRoute = createRoute({
       description: "Email already exists",
       content: { "application/json": { schema: ErrorSchema } },
     },
+    429: {
+      description: "Rate limit exceeded",
+      content: { "application/json": { schema: ErrorSchema } },
+    },
   },
 });
 
@@ -191,6 +195,10 @@ const loginChallengeRoute = createRoute({
       description: "Invalid credentials",
       content: { "application/json": { schema: ErrorSchema } },
     },
+    429: {
+      description: "Rate limit exceeded",
+      content: { "application/json": { schema: ErrorSchema } },
+    },
   },
 });
 
@@ -224,6 +232,10 @@ const loginVerifyRoute = createRoute({
     },
     401: {
       description: "Invalid credentials",
+      content: { "application/json": { schema: ErrorSchema } },
+    },
+    429: {
+      description: "Rate limit exceeded",
       content: { "application/json": { schema: ErrorSchema } },
     },
   },
