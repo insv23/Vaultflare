@@ -107,23 +107,24 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
           <DialogTitle>{isEdit ? "Edit Password" : "Add Password"}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="grid gap-4">
+        <form onSubmit={handleSubmit} autoComplete="off" className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="cf-name">Name</Label>
-            <Input id="cf-name" value={name} onChange={(e) => setName(e.target.value)} required />
+            <Label htmlFor="cf-1">Name</Label>
+            <Input id="cf-1" autoComplete="off" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="cf-username">Username</Label>
-            <Input id="cf-username" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <Label htmlFor="cf-2">Username</Label>
+            <Input id="cf-2" autoComplete="off" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="cf-password">Password</Label>
+            <Label htmlFor="cf-3">Password</Label>
             <div className="relative">
               <Input
-                id="cf-password"
+                id="cf-3"
                 type={showPassword ? "text" : "password"}
+                autoComplete="off"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="pr-20"
@@ -157,13 +158,13 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="cf-uri">URI</Label>
-            <Input id="cf-uri" value={uri} onChange={(e) => setUri(e.target.value)} placeholder="https://" />
+            <Label htmlFor="cf-4">URI</Label>
+            <Input id="cf-4" autoComplete="off" value={uri} onChange={(e) => setUri(e.target.value)} placeholder="https://" />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="cf-notes">Notes</Label>
-            <Textarea id="cf-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+            <Label htmlFor="cf-5">Notes</Label>
+            <Textarea id="cf-5" autoComplete="off" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}

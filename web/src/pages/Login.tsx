@@ -1,5 +1,5 @@
-// input: context/auth.tsx + shadcn UI 组件 + react-router
-// output: 登录页面组件
+// input: context/auth.tsx + shadcn UI 组件 + react-router + ThemeToggle
+// output: 登录页面组件（含右上角主题切换）
 // pos: 用户登录入口，两步认证对用户透明，成功后跳转 /vault
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Login() {
   const { login, isLoading } = useAuth();
@@ -39,6 +40,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Sign In</CardTitle>

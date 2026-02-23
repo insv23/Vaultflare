@@ -1,5 +1,5 @@
-// input: context/auth.tsx + shadcn UI 组件 + react-router + PasswordStrengthBar
-// output: 注册页面组件（含主密码不可恢复警告 + 密码强度指示器）
+// input: context/auth.tsx + shadcn UI 组件 + react-router + PasswordStrengthBar + ThemeToggle
+// output: 注册页面组件（含主密码不可恢复警告 + 密码强度指示器 + 右上角主题切换）
 // pos: 用户注册入口，成功后跳转到 /login
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import PasswordStrengthBar from "@/components/PasswordStrengthBar";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Register() {
   const { register, isLoading } = useAuth();
@@ -57,6 +58,9 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Create Account</CardTitle>

@@ -14,7 +14,9 @@ shadcn/ui 生成的基础组件，被 pages/ 使用。
 | ui/textarea.tsx | 基础组件 | Textarea 多行输入框 |
 | ui/slider.tsx | 基础组件 | Slider 滑块（基于 radix-ui） |
 | ui/checkbox.tsx | 基础组件 | Checkbox 勾选框（基于 radix-ui） |
-| ui/sonner.tsx | 基础组件 | Toaster 全局 toast 通知组件（基于 sonner），挂载在 App.tsx |
+| ui/sonner.tsx | 基础组件 | Toaster 全局 toast 通知组件（基于 sonner），主题跟随 next-themes resolvedTheme，挂载在 App.tsx |
+| ui/dropdown-menu.tsx | 基础组件 | DropdownMenu 下拉菜单组件（基于 radix-ui） |
+| ThemeToggle.tsx | 业务组件 | 主题切换按钮（System/Light/Dark 三选一），基于 next-themes + DropdownMenu，放置于各页面 header |
 | CipherCard.tsx | 业务组件 | 单条密码条目卡片，彩色首字母头像 + 字段行布局（user/pass/url/notes），每行独立操作按钮（copy/eye/外链），密码可切换明文 |
 | CipherForm.tsx | 业务组件 | 新增/编辑密码条目的 Dialog 表单，仅 name 必填，其余可选（至少填一个），统一 create 和 edit 两种模式，内嵌密码生成器 |
 | ChangePasswordForm.tsx | 业务组件 | 修改主密码的 Dialog 表单，三个密码输入框 + 客户端校验 + changePassword API 调用，被 Vault toolbar 触发 |

@@ -1,14 +1,25 @@
-// input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + ChangePasswordForm + PasswordGeneratorOptions + shadcn Dialog + sonner toast
-// output: Vault 主页 — 密码列表、搜索、CRUD 操作（带 toast 反馈）、删除确认、独立密码生成器弹窗、修改主密码弹窗
+// input: context/auth.tsx + context/vault.tsx + CipherCard + CipherForm + ChangePasswordForm + PasswordGeneratorOptions + shadcn Dialog/DropdownMenu + sonner toast + next-themes
+// output: Vault 主页 — 密码列表、搜索、CRUD 操作（带 toast 反馈）、删除确认、独立密码生成器弹窗、修改主密码弹窗、溢出菜单（主题/改密/登出）
 // pos: /vault 路由，登录后落地页，密码库的核心交互界面
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
 import { useState, useCallback } from "react";
-import { Plus, LogOut, Search, Loader2, Dices, Copy, Check, RefreshCw, KeyRound } from "lucide-react";
+import { Plus, LogOut, Search, Loader2, Dices, Copy, Check, RefreshCw, KeyRound, EllipsisVertical, Sun, Moon, Monitor } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/context/auth";
 import { useVault, type DecryptedCipher, type CipherData } from "@/context/vault";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import CipherCard from "@/components/CipherCard";
 import CipherForm from "@/components/CipherForm";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
@@ -119,24 +130,58 @@ export default function Vault() {
     }
   }
 
+  const { setTheme } = useTheme();
+
   return (
     <div className="mx-auto min-h-screen max-w-2xl px-4 py-6">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Vault</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" onClick={handleGenOpen} title="Password generator">
             <Dices className="size-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => setChangePwOpen(true)} title="Change password">
-            <KeyRound className="size-4" />
-          </Button>
-          <Button size="icon" onClick={handleAdd} title="Add password">
+          <Button variant="ghost" size="icon" onClick={handleAdd} title="Add password">
             <Plus className="size-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={logout} title="Sign out">
-            <LogOut className="size-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" title="More options">
+                <EllipsisVertical className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setChangePwOpen(true)}>
+                <KeyRound className="size-4" />
+                Change Password
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Sun className="size-4" />
+                  Theme
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => setTheme("system")}>
+                    <Monitor className="size-4" />
+                    System
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("light")}>
+                    <Sun className="size-4" />
+                    Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")}>
+                    <Moon className="size-4" />
+                    Dark
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout}>
+                <LogOut className="size-4" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

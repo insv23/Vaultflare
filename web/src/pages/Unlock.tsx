@@ -1,5 +1,5 @@
-// input: context/auth.tsx + shadcn UI 组件 + react-router
-// output: 解锁页面组件
+// input: context/auth.tsx + shadcn UI 组件 + react-router + ThemeToggle
+// output: 解锁页面组件（含右上角主题切换）
 // pos: Vault 锁定后的快速解锁入口，只需输入主密码
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Unlock() {
   const { token, isLocked, email, unlock, logout, isLoading } = useAuth();
@@ -45,6 +46,9 @@ export default function Unlock() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Vault Locked</CardTitle>
