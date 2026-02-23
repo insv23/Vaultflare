@@ -5,6 +5,7 @@
 export type AppEnv = {
   Bindings: {
     DB: D1Database;
+    ALLOW_REGISTRATION: string;
   };
   Variables: {
     userId: string;

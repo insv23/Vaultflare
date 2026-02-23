@@ -148,6 +148,10 @@ const registerRoute = createRoute({
       description: "Validation failed",
       content: { "application/json": { schema: ErrorSchema } },
     },
+    403: {
+      description: "Registration disabled",
+      content: { "application/json": { schema: ErrorSchema } },
+    },
     409: {
       description: "Email already exists",
       content: { "application/json": { schema: ErrorSchema } },
@@ -293,6 +297,13 @@ export const registerAuthRoutes = (app: OpenAPIHono<AppEnv>) => {
   const registerHandler: RouteHandler<typeof registerRoute, AppEnv> = async (
     c,
   ) => {
+    if (c.env.ALLOW_REGISTRATION !== "true") {
+      return c.json(
+        errorPayload("registration_disabled", "Registration is currently disabled"),
+        403,
+      );
+    }
+
     const body = c.req.valid("json");
     const email = body.email.trim().toLowerCase();
 
