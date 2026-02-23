@@ -18,9 +18,9 @@ const app = new OpenAPIHono<AppEnv>({
 
 app.onError((error, c) => handleError(c, error));
 
-app.get("/health", (c) => c.json({ status: "ok" }));
+app.get("/api/health", (c) => c.json({ status: "ok" }));
 
-app.doc("/openapi.json", {
+app.doc("/api/openapi.json", {
   openapi: "3.0.0",
   info: {
     title: "Vaultflare API",
@@ -28,7 +28,7 @@ app.doc("/openapi.json", {
   },
 });
 
-app.get("/docs", Scalar({ url: "/openapi.json" }));
+app.get("/api/docs", Scalar({ url: "/api/openapi.json" }));
 
 const loginRateLimit = rateLimitMiddleware(10, 60, "/api/auth/login");
 const registerRateLimit = rateLimitMiddleware(3, 60, "/api/auth/register");

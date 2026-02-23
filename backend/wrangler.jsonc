@@ -7,7 +7,7 @@
 		{
 			"binding": "DB",
 			"database_name": "vaultflare",
-			"database_id": "d1f12c92-7b53-4626-9173-c2d55f9bb402"
+			"database_id": "YOUR_D1_DATABASE_ID_HERE"
 		},
 	],
 	// "compatibility_flags": [
@@ -16,9 +16,9 @@
 	"vars": {
 		"ALLOW_REGISTRATION": "true"
 	},
-	"routes": [
-		{ "pattern": "vftest.insv.xyz/*", "zone_name": "insv.xyz" }
-	],
+	// "routes": [
+	// 	{ "pattern": "your-domain.com/api/*", "zone_name": "your-domain.com" }
+	// ],
 	// "kv_namespaces": [
 	//   {
 	//     "binding": "MY_KV_NAMESPACE",

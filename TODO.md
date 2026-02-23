@@ -74,6 +74,6 @@
   - 需要：Toast 提示"会话已过期，请重新登录"
   - 涉及：Web（依赖 Toast 系统）
 
-- [ ] **速率限制**
+- [x] **速率限制**
   - 登录、注册端点无 rate limiting，暴力破解无阻碍
   - 涉及：后端（Cloudflare Workers 层面）

@@ -115,8 +115,8 @@ pnpm cf-typegen # 生成 Cloudflare Bindings 类型
 
 ## 本地访问
 
-- `/openapi.json` — OpenAPI 规范 JSON
-- `/docs` — Scalar 文档界面
+- `/api/openapi.json` — OpenAPI 规范 JSON
+- `/api/docs` — Scalar 文档界面
 
 ## 改动后校验要求
 
