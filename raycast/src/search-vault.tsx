@@ -21,6 +21,7 @@ import EditCipher from "./edit-cipher";
 type DecryptedCipher = {
   cipher_id: string;
   item_version: number;
+  updated_at: number;
   data: CipherData;
 };
 
@@ -51,10 +52,14 @@ async function loadVault(): Promise<DecryptedCipher[]> {
       return {
         cipher_id: cipher.cipher_id,
         item_version: cipher.item_version,
+        updated_at: cipher.updated_at,
         data,
       };
     }),
   );
+
+  // 最近更新的排最前面
+  decrypted.sort((a, b) => b.updated_at - a.updated_at);
 
   return decrypted;
 }
