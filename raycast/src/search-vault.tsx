@@ -10,10 +10,12 @@ import {
   Icon,
   showToast,
   Toast,
+  confirmAlert,
+  Alert,
 } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { getSession, clearSession } from "./session";
-import { fetchCiphers } from "./api";
+import { fetchCiphers, deleteCipher } from "./api";
 import { decryptCipher } from "./crypto/vault";
 import type { CipherData } from "./crypto/vault";
 import EditCipher from "./edit-cipher";
@@ -135,6 +137,43 @@ export default function SearchVault() {
                     onEdited={revalidate}
                   />
                 }
+              />
+              <Action
+                title="Delete Cipher"
+                icon={Icon.Trash}
+                style={Action.Style.Destructive}
+                shortcut={{ modifiers: ["ctrl"], key: "x" }}
+                onAction={async () => {
+                  const confirmed = await confirmAlert({
+                    title: "Delete Cipher",
+                    message: `Are you sure you want to delete "${cipher.data.name}"?`,
+                    primaryAction: {
+                      title: "Delete",
+                      style: Alert.ActionStyle.Destructive,
+                    },
+                  });
+                  if (!confirmed) return;
+                  try {
+                    const session = await getSession();
+                    await deleteCipher(
+                      session.serverUrl,
+                      session.token,
+                      cipher.cipher_id,
+                      cipher.item_version,
+                    );
+                    await showToast({
+                      style: Toast.Style.Success,
+                      title: "Cipher deleted",
+                    });
+                    revalidate();
+                  } catch (err) {
+                    await showToast({
+                      style: Toast.Style.Failure,
+                      title: "Failed to delete cipher",
+                      message: err instanceof Error ? err.message : String(err),
+                    });
+                  }
+                }}
               />
               <Action
                 title="Refresh"

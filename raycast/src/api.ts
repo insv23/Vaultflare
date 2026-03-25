@@ -1,5 +1,5 @@
 // input: 无外部依赖，纯 fetch 封装
-// output: API 请求函数（challenge/verify/ciphers CRUD）+ 类型定义
+// output: API 请求函数（challenge/verify/ciphers CRUD 含删除）+ 类型定义
 // pos: 网络层，被 session.ts 和命令文件依赖
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -50,6 +50,13 @@ export type UpdateCipherResponse = {
   item_version: number;
   vault_version: number;
   updated_at: number;
+};
+
+export type DeleteCipherResponse = {
+  cipher_id: string;
+  deleted_at: number;
+  item_version: number;
+  vault_version: number;
 };
 
 // ---- KDF 参数映射 ----
@@ -168,6 +175,22 @@ export async function updateCipher(
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify(payload),
+    },
+  );
+}
+
+export async function deleteCipher(
+  serverUrl: string,
+  token: string,
+  cipherId: string,
+  expectedVersion: number,
+): Promise<DeleteCipherResponse> {
+  return request<DeleteCipherResponse>(
+    serverUrl,
+    `/api/ciphers/${cipherId}?expected_version=${expectedVersion}`,
+    {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     },
   );
 }
