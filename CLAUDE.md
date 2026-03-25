@@ -1,6 +1,6 @@
 # Vaultflare
 
-前后端彻底分离的架构。三个独立项目共享一个 git 仓库，各自独立开发和部署。
+前后端彻底分离的架构。多个独立项目共享一个 git 仓库，各自独立开发和部署。
 
 ## 项目结构
 
@@ -8,15 +8,17 @@
 Vaultflare/
 ├── backend/          # Hono + Cloudflare Workers + D1 + Scalar API
 ├── web/              # 网页端，Cloudflare Workers (不用 Pages，已废弃)
+├── raycast/          # Raycast 桌面插件（macOS，个人使用）
 └── chrome-extension/ # Chrome 插件
 ```
 
-**不是 monorepo**，只是把相关项目放在一起方便管理。每个子目录独立运行 `pnpm install`，没有共享依赖。
+**不是 monorepo**，只是把相关项目放在一起方便管理。每个子目录独立运行包管理器安装，没有共享依赖。
 
 ## 技术栈
 
 - **后端**: Hono, Cloudflare Workers, Cloudflare D1, Scalar (API 文档)
 - **前端**: Cloudflare Workers + Static Assets
+- **Raycast**: @raycast/api, Node.js 22, hash-wasm (crypto 层复用 web 端)
 - **插件**: Chrome Extension Manifest V3
 
 ## 协作方式
@@ -44,6 +46,12 @@ cd backend && pnpm -s tsc --noEmit
 
 ```bash
 cd web && pnpm -s tsc -b --noEmit
+```
+
+每次改动raycast端代码后，必须执行以下命令进行类型检查：
+
+```bash
+cd raycast && npx tsc --noEmit
 ```
 
 

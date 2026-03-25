@@ -1,0 +1,63 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "vaultflare",
+  "title": "Vaultflare",
+  "description": "Search and manage your Vaultflare password vault",
+  "icon": "command-icon.png",
+  "author": "tony",
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "search-vault",
+      "title": "Search Vault",
+      "description": "Search and copy credentials from your vault",
+      "mode": "view"
+    },
+    {
+      "name": "add-cipher",
+      "title": "Add Cipher",
+      "description": "Add a new password entry to your vault",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "serverUrl",
+      "title": "Server URL",
+      "description": "Your Vaultflare backend URL (e.g. https://api.example.com)",
+      "type": "textfield",
+      "required": true
+    },
+    {
+      "name": "email",
+      "title": "Email",
+      "description": "Your Vaultflare account email",
+      "type": "textfield",
+      "required": true
+    },
+    {
+      "name": "masterPassword",
+      "title": "Master Password",
+      "description": "Your master password (stored encrypted by Raycast)",
+      "type": "password",
+      "required": true
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.104.5",
+    "@raycast/utils": "^2.2.2",
+    "hash-wasm": "^4.12.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "typescript": "^5.5.0",
+    "@types/node": "~22.14.0",
+    "@types/react": "^19.0.0"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint"
+  }
+}
