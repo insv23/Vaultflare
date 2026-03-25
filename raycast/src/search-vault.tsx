@@ -109,21 +109,25 @@ export default function SearchVault() {
           ].filter(Boolean)}
           actions={
             <ActionPanel>
-              {cipher.data.password && (
-                <Action.CopyToClipboard
-                  title="Copy Password"
-                  content={cipher.data.password}
-                  concealed
-                />
-              )}
               {cipher.data.username && (
                 <Action.CopyToClipboard
                   title="Copy Username"
                   content={cipher.data.username}
                 />
               )}
+              {cipher.data.password && (
+                <Action.CopyToClipboard
+                  title="Copy Password"
+                  content={cipher.data.password}
+                  concealed
+                  shortcut={{ modifiers: ["cmd"], key: "return" }}
+                />
+              )}
               {cipher.data.uri && (
-                <Action.OpenInBrowser url={cipher.data.uri} />
+                <Action.OpenInBrowser
+                  url={cipher.data.uri}
+                  shortcut={{ modifiers: ["cmd"], key: "o" }}
+                />
               )}
               <Action.Push
                 title="Edit Cipher"
