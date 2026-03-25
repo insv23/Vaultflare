@@ -45,6 +45,13 @@ export type CreateCipherResponse = {
   created_at: number;
 };
 
+export type UpdateCipherResponse = {
+  cipher_id: string;
+  item_version: number;
+  vault_version: number;
+  updated_at: number;
+};
+
 // ---- KDF 参数映射 ----
 
 /** 后端 API → hash-wasm（memory → memorySize） */
@@ -142,4 +149,25 @@ export async function createCipher(
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(encryptedData),
   });
+}
+
+export async function updateCipher(
+  serverUrl: string,
+  token: string,
+  cipherId: string,
+  payload: {
+    encrypted_data: string;
+    encrypted_dek: string;
+    expected_version: number;
+  },
+): Promise<UpdateCipherResponse> {
+  return request<UpdateCipherResponse>(
+    serverUrl,
+    `/api/ciphers/${cipherId}`,
+    {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    },
+  );
 }

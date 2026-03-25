@@ -16,9 +16,11 @@ import { getSession, clearSession } from "./session";
 import { fetchCiphers } from "./api";
 import { decryptCipher } from "./crypto/vault";
 import type { CipherData } from "./crypto/vault";
+import EditCipher from "./edit-cipher";
 
 type DecryptedCipher = {
   cipher_id: string;
+  item_version: number;
   data: CipherData;
 };
 
@@ -46,7 +48,11 @@ async function loadVault(): Promise<DecryptedCipher[]> {
         cipher.encrypted_dek,
         cipher.encrypted_data,
       );
-      return { cipher_id: cipher.cipher_id, data };
+      return {
+        cipher_id: cipher.cipher_id,
+        item_version: cipher.item_version,
+        data,
+      };
     }),
   );
 
@@ -112,6 +118,19 @@ export default function SearchVault() {
               {cipher.data.uri && (
                 <Action.OpenInBrowser url={cipher.data.uri} />
               )}
+              <Action.Push
+                title="Edit Cipher"
+                icon={Icon.Pencil}
+                shortcut={{ modifiers: ["cmd"], key: "e" }}
+                target={
+                  <EditCipher
+                    cipherId={cipher.cipher_id}
+                    itemVersion={cipher.item_version}
+                    data={cipher.data}
+                    onEdited={revalidate}
+                  />
+                }
+              />
               <Action
                 title="Refresh"
                 icon={Icon.ArrowClockwise}

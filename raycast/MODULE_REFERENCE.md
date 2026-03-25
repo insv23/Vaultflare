@@ -13,6 +13,7 @@ Raycast 桌面插件，用于快速检索密码、复制凭据、添加新条目
 | `tsconfig.json` | 编译配置 | TypeScript 编译选项 |
 | `src/search-vault.tsx` | 主命令 | 搜索密码库 + 复制凭据（List 视图） |
 | `src/add-cipher.tsx` | 辅助命令 | 添加新密码条目（Form 视图） |
+| `src/edit-cipher.tsx` | 子视图组件 | 编辑已有密码条目（由 search-vault Push 调用） |
 | `src/api.ts` | 网络层 | API 请求封装 + 类型定义 |
 | `src/session.ts` | 认证中枢 | 登录状态管理 + token 缓存 |
 | `src/crypto/argon2.ts` | 密码学第一环 | Argon2id 密钥派生（从 web 复制） |
