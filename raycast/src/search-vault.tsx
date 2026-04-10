@@ -83,7 +83,7 @@ export default function SearchVault() {
   });
 
   return (
-    <List isLoading={isLoading} searchBarPlaceholder="Search vault...">
+    <List isLoading={isLoading} isShowingDetail searchBarPlaceholder="Search vault...">
       {error && !data && (
         <List.EmptyView
           icon={Icon.ExclamationMark}
@@ -99,14 +99,52 @@ export default function SearchVault() {
       {data?.map((cipher) => (
         <List.Item
           key={cipher.cipher_id}
-          icon={Icon.Key}
+          icon={
+            cipher.data.uri && hostname(cipher.data.uri)
+              ? { source: `https://www.google.com/s2/favicons?domain=${hostname(cipher.data.uri)}&sz=64`, fallback: Icon.Key }
+              : Icon.Key
+          }
           title={cipher.data.name}
           subtitle={cipher.data.username ?? ""}
-          accessories={[{ text: hostname(cipher.data.uri) }]}
           keywords={[
             cipher.data.username ?? "",
             hostname(cipher.data.uri),
           ].filter(Boolean)}
+          detail={
+            <List.Item.Detail
+              markdown={cipher.data.notes ? `**Notes**\n\n${cipher.data.notes}` : undefined}
+              metadata={
+                <List.Item.Detail.Metadata>
+                  {cipher.data.username ? (
+                    <List.Item.Detail.Metadata.Label title="Username" text={cipher.data.username} icon={Icon.Person} />
+                  ) : (
+                    <List.Item.Detail.Metadata.Label title="Username" text="–" />
+                  )}
+                  <List.Item.Detail.Metadata.Label
+                    title="Password"
+                    text={cipher.data.password ? "••••••••" : "–"}
+                    icon={Icon.Lock}
+                  />
+                  <List.Item.Detail.Metadata.Separator />
+                  {cipher.data.uri ? (
+                    <List.Item.Detail.Metadata.Link
+                      title="Website"
+                      text={hostname(cipher.data.uri)}
+                      target={cipher.data.uri}
+                    />
+                  ) : (
+                    <List.Item.Detail.Metadata.Label title="Website" text="–" />
+                  )}
+                  <List.Item.Detail.Metadata.Separator />
+                  <List.Item.Detail.Metadata.Label
+                    title="Updated"
+                    text={new Date(cipher.updated_at).toLocaleString()}
+                    icon={Icon.Clock}
+                  />
+                </List.Item.Detail.Metadata>
+              }
+            />
+          }
           actions={
             <ActionPanel>
               {cipher.data.username && (
