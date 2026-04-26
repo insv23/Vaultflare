@@ -102,7 +102,7 @@ export default function CipherForm({ open, onClose, onSubmit, initialData }: Pro
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent>
+      <DialogContent onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Password" : "Add Password"}</DialogTitle>
         </DialogHeader>
