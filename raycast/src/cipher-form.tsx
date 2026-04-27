@@ -57,9 +57,10 @@ export default function CipherForm({
         placeholder="e.g. user@example.com"
         defaultValue={initialValues?.username ?? ""}
       />
-      <Form.PasswordField
+      <Form.TextField
         id="password"
         title="Password"
+        placeholder="Paste or type password"
         defaultValue={initialValues?.password ?? ""}
       />
       <Form.TextField
