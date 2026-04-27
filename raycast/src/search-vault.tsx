@@ -14,7 +14,7 @@ import {
   Alert,
 } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
-import { getSession, clearSession } from "./session";
+import { withSessionRetry } from "./session";
 import { fetchCiphers, deleteCipher } from "./api";
 import { decryptCipher } from "./crypto/vault";
 import type { CipherData } from "./crypto/vault";
@@ -38,8 +38,10 @@ function hostname(uri?: string): string {
 }
 
 async function loadVault(): Promise<DecryptedCipher[]> {
-  const session = await getSession();
-  const res = await fetchCiphers(session.serverUrl, session.token);
+  const { session, res } = await withSessionRetry(async (session) => ({
+    session,
+    res: await fetchCiphers(session.serverUrl, session.token),
+  }));
 
   // 只解密未删除的条目
   const active = res.ciphers.filter((c) => c.deleted_at === null);
@@ -70,10 +72,6 @@ export default function SearchVault() {
   const { data, isLoading, revalidate, error } = useCachedPromise(loadVault, [], {
     keepPreviousData: true,
     onError: async (err) => {
-      // token 过期等认证错误，清除缓存后重试
-      if (err instanceof Error && err.message.includes("401")) {
-        await clearSession();
-      }
       await showToast({
         style: Toast.Style.Failure,
         title: "Failed to load vault",
@@ -197,12 +195,13 @@ export default function SearchVault() {
                   });
                   if (!confirmed) return;
                   try {
-                    const session = await getSession();
-                    await deleteCipher(
-                      session.serverUrl,
-                      session.token,
-                      cipher.cipher_id,
-                      cipher.item_version,
+                    await withSessionRetry((session) =>
+                      deleteCipher(
+                        session.serverUrl,
+                        session.token,
+                        cipher.cipher_id,
+                        cipher.item_version,
+                      ),
                     );
                     await showToast({
                       style: Toast.Style.Success,

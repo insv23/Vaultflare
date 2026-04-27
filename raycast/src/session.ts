@@ -7,7 +7,7 @@ import { getPreferenceValues, LocalStorage } from "@raycast/api";
 import { deriveIKM } from "./crypto/argon2";
 import { deriveMasterKey, deriveAuthKey } from "./crypto/keys";
 import { base64ToUint8 } from "./crypto/keys";
-import { fetchChallenge, fetchVerify, toKdfParams } from "./api";
+import { ApiError, fetchChallenge, fetchVerify, toKdfParams } from "./api";
 import type { KdfParams } from "./crypto/argon2";
 
 type Preferences = {
@@ -118,4 +118,25 @@ export async function clearSession(): Promise<void> {
     LocalStorage.removeItem(CACHE_KDF_SALT),
     LocalStorage.removeItem(CACHE_KDF_PARAMS),
   ]);
+}
+
+/**
+ * 使用当前 session 执行操作；如果后端返回 401，则清缓存、重新登录并重试一次。
+ */
+export async function withSessionRetry<T>(
+  operation: (session: Session) => Promise<T>,
+): Promise<T> {
+  const session = await getSession();
+
+  try {
+    return await operation(session);
+  } catch (err) {
+    if (!(err instanceof ApiError) || err.status !== 401) {
+      throw err;
+    }
+
+    await clearSession();
+    const freshSession = await getSession();
+    return operation(freshSession);
+  }
 }

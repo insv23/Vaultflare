@@ -10,7 +10,7 @@ import {
   Icon,
   type LaunchProps,
 } from "@raycast/api";
-import { getSession } from "./session";
+import { withSessionRetry } from "./session";
 import { createCipher } from "./api";
 import { encryptCipher } from "./crypto/vault";
 import type { CipherData } from "./crypto/vault";
@@ -33,8 +33,6 @@ export default function AddCipher({
 
     setIsSubmitting(true);
     try {
-      const session = await getSession();
-
       const data: CipherData = {
         name: values.name.trim(),
         ...(values.username && { username: values.username }),
@@ -43,8 +41,10 @@ export default function AddCipher({
         ...(values.notes && { notes: values.notes }),
       };
 
-      const encrypted = await encryptCipher(session.masterKey, data);
-      await createCipher(session.serverUrl, session.token, encrypted);
+      await withSessionRetry(async (session) => {
+        const encrypted = await encryptCipher(session.masterKey, data);
+        await createCipher(session.serverUrl, session.token, encrypted);
+      });
 
       await showToast({
         style: Toast.Style.Success,
