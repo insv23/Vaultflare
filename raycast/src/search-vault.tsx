@@ -68,6 +68,14 @@ async function loadVault(): Promise<DecryptedCipher[]> {
   return decrypted;
 }
 
+function renderNotesMarkdown(notes?: string): string | undefined {
+  if (!notes) return undefined;
+  // Raycast detail markdown does not reliably preserve plain newline characters
+  // as visible line breaks, so we normalize them here to keep notes looking the
+  // same as the user originally entered them.
+  return `**Notes**\n\n${notes.replace(/\n/g, "  \n")}`;
+}
+
 export default function SearchVault() {
   const { data, isLoading, revalidate, error } = useCachedPromise(loadVault, [], {
     keepPreviousData: true,
@@ -110,7 +118,7 @@ export default function SearchVault() {
           ].filter(Boolean)}
           detail={
             <List.Item.Detail
-              markdown={cipher.data.notes ? `**Notes**\n\n${cipher.data.notes}` : undefined}
+              markdown={renderNotesMarkdown(cipher.data.notes)}
               metadata={
                 <List.Item.Detail.Metadata>
                   {cipher.data.username ? (
