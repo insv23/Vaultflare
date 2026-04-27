@@ -1,5 +1,5 @@
 // input: session.ts (认证) + api.ts (获取列表) + crypto/vault.ts (解密)
-// output: Search Vault 命令 — Raycast List 视图，搜索并复制密码
+// output: Search Vault 命令 — Raycast List 视图，搜索并通过快捷键复制凭据
 // pos: 主命令，用户最常用的入口
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -151,6 +151,7 @@ export default function SearchVault() {
                 <Action.CopyToClipboard
                   title="Copy Username"
                   content={cipher.data.username}
+                  shortcut={{ modifiers: ["cmd"], key: "c" }}
                 />
               )}
               {cipher.data.password && (
@@ -158,7 +159,7 @@ export default function SearchVault() {
                   title="Copy Password"
                   content={cipher.data.password}
                   concealed
-                  shortcut={{ modifiers: ["cmd"], key: "return" }}
+                  shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
                 />
               )}
               {cipher.data.uri && (

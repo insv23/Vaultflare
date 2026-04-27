@@ -31,7 +31,7 @@ Vaultflare 的前端和后端共用同一个域名，通过路径前缀区分：
 
 ## 命令
 
-- **Search Vault** — 搜索密码库，选中条目按 Enter 复制密码，也可复制用户名或打开网址
+- **Search Vault** — 搜索密码库，`Cmd+C` 复制用户名，`Cmd+Shift+C` 复制密码，也可打开网址
 - **Add Cipher** — 填表添加新密码条目
 
 ## 已知行为

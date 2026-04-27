@@ -3,7 +3,7 @@
 > 一旦我所属的文件夹有所变化，请更新我。
 > 任何功能、架构、写法更新必须在工作结束后更新此文档。
 
-Raycast 桌面插件，用于快速检索密码、复制凭据、添加新条目。Node.js 22 + React 19 运行时。
+Raycast 桌面插件，用于快速检索密码、通过快捷键复制凭据、添加新条目。Node.js 22 + React 19 运行时。
 
 ## 文件清单
 
@@ -11,7 +11,7 @@ Raycast 桌面插件，用于快速检索密码、复制凭据、添加新条目
 |------|------|------|
 | `package.json` | 项目配置 | 命令声明、preferences、依赖 |
 | `tsconfig.json` | 编译配置 | TypeScript 编译选项 |
-| `src/search-vault.tsx` | 主命令 | 搜索密码库 + 复制凭据（List 视图） |
+| `src/search-vault.tsx` | 主命令 | 搜索密码库 + 复制凭据（`Cmd+C` 用户名，`Cmd+Shift+C` 密码） |
 | `src/add-cipher.tsx` | 辅助命令 | 添加新密码条目（Form 视图） |
 | `src/edit-cipher.tsx` | 子视图组件 | 编辑已有密码条目（由 search-vault Push 调用） |
 | `src/api.ts` | 网络层 | API 请求封装 + 类型定义 |
