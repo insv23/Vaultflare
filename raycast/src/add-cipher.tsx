@@ -3,7 +3,13 @@
 // pos: 辅助命令，用于快速添加新密码
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
-import { showToast, Toast, popToRoot, Icon } from "@raycast/api";
+import {
+  showToast,
+  Toast,
+  popToRoot,
+  Icon,
+  type LaunchProps,
+} from "@raycast/api";
 import { getSession } from "./session";
 import { createCipher } from "./api";
 import { encryptCipher } from "./crypto/vault";
@@ -11,7 +17,9 @@ import type { CipherData } from "./crypto/vault";
 import { useState } from "react";
 import CipherForm, { type CipherFormValues } from "./cipher-form";
 
-export default function AddCipher() {
+export default function AddCipher({
+  draftValues,
+}: LaunchProps<{ draftValues: CipherFormValues }>) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(values: CipherFormValues) {
@@ -57,9 +65,11 @@ export default function AddCipher() {
 
   return (
     <CipherForm
+      enableDrafts
       isSubmitting={isSubmitting}
       submitTitle="Add Cipher"
       submitIcon={Icon.Plus}
+      initialValues={draftValues}
       onSubmit={handleSubmit}
     />
   );

@@ -20,6 +20,7 @@ type CipherFormProps = {
   submitIcon: Icon;
   navigationTitle?: string;
   initialValues?: Partial<CipherData>;
+  enableDrafts?: boolean;
   onSubmit: (values: CipherFormValues) => void | Promise<void>;
 };
 
@@ -29,10 +30,12 @@ export default function CipherForm({
   submitIcon,
   navigationTitle,
   initialValues,
+  enableDrafts,
   onSubmit,
 }: CipherFormProps) {
   return (
     <Form
+      enableDrafts={enableDrafts}
       isLoading={isSubmitting}
       navigationTitle={navigationTitle}
       actions={
