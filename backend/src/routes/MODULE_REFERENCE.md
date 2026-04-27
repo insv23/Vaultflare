@@ -45,7 +45,7 @@
   - `PUT /api/ciphers/{id}`: `encrypted_dek`, `encrypted_data`, `expected_version`。
   - `DELETE /api/ciphers/{id}`: `expected_version` query。
 - 输出:
-  - 返回当前用户视角的 cipher 数据和 `vault_version`。
+  - 返回当前用户视角的 cipher 数据和 `vault_version`，全量列表默认按最近更新优先。
   - 更新/删除返回最新 `item_version` 与 `vault_version`，供客户端继续同步。
 - 依赖:
   - `mappers/cipher.mapper`（行结构转响应结构）

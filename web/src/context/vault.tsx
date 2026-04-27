@@ -1,5 +1,5 @@
 // input: api/client.ts + crypto/vault.ts + context/auth.tsx
-// output: VaultProvider + useVault() — 密码库状态管理，暴露 CRUD 操作
+// output: VaultProvider + useVault() — 密码库状态管理，按最近更新维护列表，暴露 CRUD 操作
 // pos: 全局密码库上下文，被 pages/Vault.tsx 消费
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
@@ -113,7 +113,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
           created_at: res.created_at,
           updated_at: res.created_at,
         };
-        setCiphers((prev) => [...prev, newCipher]);
+        setCiphers((prev) => [newCipher, ...prev]);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to create cipher");
         throw e;
@@ -142,18 +142,19 @@ export function VaultProvider({ children }: { children: ReactNode }) {
           },
         );
 
-        setCiphers((prev) =>
-          prev.map((c) =>
-            c.cipher_id === id
-              ? {
-                  ...c,
-                  data,
-                  item_version: res.item_version,
-                  updated_at: res.updated_at,
-                }
-              : c,
-          ),
-        );
+        setCiphers((prev) => {
+          const existing = prev.find((c) => c.cipher_id === id);
+          if (!existing) return prev;
+
+          const updated: DecryptedCipher = {
+            ...existing,
+            data,
+            item_version: res.item_version,
+            updated_at: res.updated_at,
+          };
+
+          return [updated, ...prev.filter((c) => c.cipher_id !== id)];
+        });
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to update cipher");
         throw e;

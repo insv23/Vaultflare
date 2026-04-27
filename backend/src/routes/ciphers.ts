@@ -1,5 +1,5 @@
 // input: authenticated cipher API requests and ciphers/users tables.
-// output: cipher CRUD + sync endpoints with version conflict control.
+// output: cipher CRUD + sync endpoints with recent-update list ordering and version conflict control.
 // pos: encrypted vault data management layer on the server side.
 
 import {
@@ -348,7 +348,7 @@ export const registerCipherRoutes = (app: OpenAPIHono<AppEnv>) => {
       `SELECT id, encrypted_dek, encrypted_data, item_version, vault_version, deleted_at, created_at, updated_at
        FROM ciphers
        WHERE user_id = ?
-       ORDER BY vault_version ASC`,
+       ORDER BY updated_at DESC, vault_version DESC`,
     )
       .bind(userId)
       .all()) as { results?: CipherRow[] };
