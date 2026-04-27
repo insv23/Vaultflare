@@ -3,33 +3,18 @@
 // pos: 辅助命令，用于快速添加新密码
 // 一旦我被更新，务必更新我的开头注释，以及所属的文件夹的md。
 
-import {
-  Form,
-  ActionPanel,
-  Action,
-  showToast,
-  Toast,
-  popToRoot,
-  Icon,
-} from "@raycast/api";
+import { showToast, Toast, popToRoot, Icon } from "@raycast/api";
 import { getSession } from "./session";
 import { createCipher } from "./api";
 import { encryptCipher } from "./crypto/vault";
 import type { CipherData } from "./crypto/vault";
 import { useState } from "react";
-
-type FormValues = {
-  name: string;
-  username: string;
-  password: string;
-  uri: string;
-  notes: string;
-};
+import CipherForm, { type CipherFormValues } from "./cipher-form";
 
 export default function AddCipher() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(values: FormValues) {
+  async function handleSubmit(values: CipherFormValues) {
     if (!values.name.trim()) {
       await showToast({
         style: Toast.Style.Failure,
@@ -71,31 +56,11 @@ export default function AddCipher() {
   }
 
   return (
-    <Form
-      isLoading={isSubmitting}
-      actions={
-        <ActionPanel>
-          <Action.SubmitForm
-            title="Add Cipher"
-            icon={Icon.Plus}
-            onSubmit={handleSubmit}
-          />
-        </ActionPanel>
-      }
-    >
-      <Form.TextField id="name" title="Name" placeholder="e.g. GitHub" />
-      <Form.TextField
-        id="username"
-        title="Username"
-        placeholder="e.g. user@example.com"
-      />
-      <Form.PasswordField id="password" title="Password" />
-      <Form.TextField
-        id="uri"
-        title="URL"
-        placeholder="e.g. https://github.com"
-      />
-      <Form.TextArea id="notes" title="Notes" placeholder="Optional notes" />
-    </Form>
+    <CipherForm
+      isSubmitting={isSubmitting}
+      submitTitle="Add Cipher"
+      submitIcon={Icon.Plus}
+      onSubmit={handleSubmit}
+    />
   );
 }
