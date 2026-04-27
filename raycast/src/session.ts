@@ -38,7 +38,9 @@ const CACHE_KDF_PARAMS = "session_kdf_params";
  */
 export async function getSession(): Promise<Session> {
   const prefs = getPreferenceValues<Preferences>();
-  const { serverUrl, email, masterPassword } = prefs;
+  const serverUrl = prefs.serverUrl.trim();
+  const email = prefs.email.trim();
+  const { masterPassword } = prefs;
 
   // 检查缓存的 token
   const [cachedToken, cachedExpires, cachedSalt, cachedParams] =
