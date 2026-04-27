@@ -147,6 +147,19 @@ export default function SearchVault() {
           }
           actions={
             <ActionPanel>
+              <Action.Push
+                title="Edit Cipher"
+                icon={Icon.Pencil}
+                shortcut={{ modifiers: ["cmd"], key: "e" }}
+                target={
+                  <EditCipher
+                    cipherId={cipher.cipher_id}
+                    itemVersion={cipher.item_version}
+                    data={cipher.data}
+                    onEdited={revalidate}
+                  />
+                }
+              />
               {cipher.data.username && (
                 <Action.CopyToClipboard
                   title="Copy Username"
@@ -168,19 +181,6 @@ export default function SearchVault() {
                   shortcut={{ modifiers: ["cmd"], key: "o" }}
                 />
               )}
-              <Action.Push
-                title="Edit Cipher"
-                icon={Icon.Pencil}
-                shortcut={{ modifiers: ["cmd"], key: "e" }}
-                target={
-                  <EditCipher
-                    cipherId={cipher.cipher_id}
-                    itemVersion={cipher.item_version}
-                    data={cipher.data}
-                    onEdited={revalidate}
-                  />
-                }
-              />
               <Action
                 title="Delete Cipher"
                 icon={Icon.Trash}
